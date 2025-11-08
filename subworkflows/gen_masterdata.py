@@ -113,8 +113,8 @@ def get_flexi_sequences(df, len_barcode, fasta):
         else:
             gene1seq = None
             gene2seq = None
-        gene1_seq.append(gene1seq)
-        gene2_seq.append(gene2seq)	
+        gene1_seq.append(str(gene1seq).upper())
+        gene2_seq.append(str(gene2seq).upper())	
 
 
     df['sequence1'] = gene1_seq

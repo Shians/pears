@@ -4,7 +4,8 @@ cd ..
 git clone https://github.com/alexdobin/STAR
 cd ./STAR/source && make
 cd ../../
-git clone https://github.com/DavidsonGroup/flexiplex
+wget https://github.com/DavidsonGroup/flexiplex/releases/download/v1.02.5/flexiplex-v1.02.5.tar.gz
+tar -xf flexiplex-v1.02.5.tar.gz
 cd ./flexiplex && make
 cd ../barcodes/ && gunzip *.gz
 cd ..
