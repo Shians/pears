@@ -13,7 +13,7 @@ process runFuscia {
 	// Use Groovy's conditional logic to handle the min and max comparison
     	def gr1 = "${chrom1}:${Math.min(gene1.toInteger(), base1.toInteger())}-${Math.max(gene1.toInteger(), base1.toInteger())}"
     	def gr2 = "${chrom2}:${Math.min(gene2.toInteger(), base2.toInteger())}-${Math.max(gene2.toInteger(), base2.toInteger())}"
-    	def fusion_name = "${fusion_genes}_${task.index}"
+    	def fusion_name = "${fusion_genes}_${chrom1}_${base1}_${chrom2}_${base2}"
 
     	"""
     	# Define regions and fusion name in shell format

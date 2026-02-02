@@ -138,4 +138,5 @@ add_gene_range = get_gene_range(gene, gene_dict)
 fuscia_gene_range = gene_range(shr_output, add_gene_range, up, down)
 flexi_gene_range = get_flexi_sequences(fuscia_gene_range, int(flexi_searchlen), fasta)
 flexi_gene_range = flexi_gene_range.rename(columns={"fusion genes": "fusion_genes"})
+flexi_gene_range = flexi_gene_range.drop_duplicates() #remove duplicates in the fusion list
 flexi_gene_range.to_csv(f'{out_dir}/masterdata.csv', index = False)

@@ -9,6 +9,7 @@ process RUN_STARsolo {
 	params.read2
 	params.out_dir
 	params.STAR
+	params.possible_barcode_list
 
 	output:
 	path "Aligned.sortedByCoord.out.bam" // Define outputs
@@ -41,7 +42,7 @@ process RUN_STARsolo {
 	--chimSegmentReadGapMax 3 \
 	--chimMultimapNmax 50 \
 	--soloType CB_UMI_Simple \
-	--soloCBwhitelist $params.barcode_whitelist \
+	--soloCBwhitelist $params.possible_barcode_list \
 	--soloUMIlen $params.umi_len \
 	--soloUMIdedup NoDedup \
 	--outSAMattributes NH HI nM AS CB UB \

@@ -18,20 +18,40 @@ workflow {
 	GEN_MASTERDATA()
 	masterdata_ch = GEN_MASTERDATA.out
 	
-        mapped_ch = masterdata_ch \
-                | splitCsv(header:true) \
-                | map { row -> tuple(row.fusion_genes, row.'chrom1', row.gene1, row.base1, row.sequence1, row.chrom2, row.gene2, row.base2, row.sequence2)}
+	mapped_ch = masterdata_ch \
+       	   | splitCsv(header:true) \
+           | map { row ->
+ 	   tuple(
+                row.fusion_genes,
+                row.chrom1,
+                row.gene1,
+                row.base1,
+                row.sequence1,
+                row.chrom2,
+                row.gene2,
+                row.base2,
+                row.sequence2
+            	)
+            }
 
 	STARsolo_result = RUN_STARsolo()
 
-	Fuscia_output_ch = runFuscia(mapped_ch, STARsolo_result[0], STARsolo_result[1]).collect() // Passing only BAM and BAM index
-        Flexiplex_output_ch = runFlexiplex(mapped_ch,STARsolo_result[2]).collect()
+	Fuscia_output_ch   = runFuscia(mapped_ch, STARsolo_result[0], STARsolo_result[1])
+//	Flexiplex_output_ch = runFlexiplex(mapped_ch, STARsolo_result[2])
+	Flexiplex_output_ch = runFlexiplex(mapped_ch)
 	Arriba_output_ch = runArriba(STARsolo_result[0])
-	ArribaBC_output_ch = getBarcodes_Arriba(mapped_ch,Arriba_output_ch,STARsolo_result[2]).collect()
+//	ArribaBC_output_ch  = getBarcodes_Arriba(mapped_ch, Arriba_output_ch, STARsolo_result[2])
+	ArribaBC_output_ch  = getBarcodes_Arriba(mapped_ch, Arriba_output_ch)
 
-	formatFuscia(Fuscia_output_ch,"master_fuscia.csv")
-	formatFlexiplex1(Flexiplex_output_ch,"flexiplex_out","master_flexiplex.csv")
-	formatFlexiplex2(ArribaBC_output_ch,"arriba_out","master_arriba.csv")
+	// collapse each into a single emission
+	Fuscia_collected   = Fuscia_output_ch | collect
+	Flexiplex_collected = Flexiplex_output_ch | collect
+	ArribaBC_collected  = ArribaBC_output_ch | collect
+
+	// formatting
+	formatFuscia(Fuscia_collected, "master_fuscia.csv")
+	formatFlexiplex1(Flexiplex_collected, "flexiplex_out", "master_flexiplex.csv")
+	formatFlexiplex2(ArribaBC_collected, "arriba_out", "master_arriba.csv")
 
 }
 

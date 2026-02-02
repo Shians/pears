@@ -1,7 +1,12 @@
 process formatFuscia{
+	publishDir "${params.out_dir}", mode: 'copy'
+
 	input:
 	val "fuscia complete"
 	val output_file
+
+	output:
+	path "${output_file}"
 
 	script:
 	"""
@@ -30,17 +35,21 @@ process formatFuscia{
 	# Remove non-unique rows
 	df = df.drop_duplicates()
 
-	df.to_csv(f'$params.out_dir/$output_file', index=False)
+	df.to_csv('${output_file}', index=False)
 
 	"""
-
 }
 
 process formatFlexiplex{
+	publishDir "${params.out_dir}", mode: 'copy'
+
 	input:
-	path('*')	
+	path('*')
 	val dir
 	val output_file
+
+	output:
+	path "${output_file}"
 
 	script:
 	"""
@@ -64,7 +73,7 @@ process formatFlexiplex{
 			df = pd.concat([df, r], axis = 0, ignore_index = True)
 	# Remove non-unique rows
 	df = df.drop_duplicates()
-	df.to_csv(f'$params.out_dir/$output_file', index=False)	
+	df.to_csv(f'$output_file', index=False)	
 
 	"""
 
