@@ -1,4 +1,4 @@
-process gen_genome {
+process genGenome {
     label 'process_high'
     publishDir "${projectDir}/modules/STAR/"
 

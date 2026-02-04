@@ -51,7 +51,7 @@ process RunSTARSolo {
 
 }
 
-process format_bam {
+process formatBAM {
 	label 'process_tiny'
 	publishDir "${params.out_dir}/STARsolo"
 
