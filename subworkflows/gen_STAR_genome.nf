@@ -7,7 +7,7 @@ process genGenome {
 
     $projectDir/modules/arriba/download_references.sh $params.arriba_genome_version
 
-    $projectDir/modules/STAR/source/STAR --runThreadN $task.cpus \
+    STAR --runThreadN $task.cpus \
     --runMode genomeGenerate \
     --genomeDir $projectDir/STAR/STAR_index_GRCh38_GENCODE38 \
     --genomeFastaFiles $projectDir/arriba/GRCh38.fa\

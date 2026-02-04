@@ -10,7 +10,7 @@ process runArriba {
 
 	script:
 	"""
-	${projectDir}/modules/arriba/arriba \
+	arriba \
 		-x $bam_file \
 		-o fusions.tsv \
 		-O fusions.discarded.tsv \
@@ -46,7 +46,7 @@ process getBarcodesArriba {
 		grep -f - <(gunzip -c ${params.fastq_r1}) -A3 --no-group-separator |\
 			sed "/^[@+]/! s/^/START/g" > "\$fusion_name".fastq ;
 
-		${projectDir}/modules/flexiplex/flexiplex -x START \
+	flexiplex -x START \
 		${params.flexiplex_demultiplex_options} \
 		-k ${params.barcode_whitelist} -n barcodes_"\$fusion_name" \
 		"\$fusion_name".fastq
