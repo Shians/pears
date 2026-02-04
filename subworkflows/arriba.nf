@@ -1,7 +1,6 @@
 process runArriba {
+	label 'process_medium'
 	publishDir "${params.out_dir}/arriba_out", mode: 'copy'
-	time '24h'
-	memory '100GB'
 
 	input:
 	path bam_file
@@ -22,6 +21,7 @@ process runArriba {
 }
 
 process getBarcodesArriba {
+	label 'process_tiny'
 	publishDir "${params.out_dir}/arriba_out", mode: 'copy'
 
 	input:

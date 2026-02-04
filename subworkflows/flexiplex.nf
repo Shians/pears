@@ -5,6 +5,7 @@
 //path barcode_file
 
 process runFlexiplex {
+	label 'process_low'
 	publishDir "${params.out_dir}/flexiplex_out", mode: 'copy'
 	
 	input:

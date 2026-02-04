@@ -1,7 +1,6 @@
 process RunSTARSolo {
+	label 'process_high'
 	publishDir "${params.out_dir}/STARsolo", mode: 'copy'
-	time '24h'
-	memory '200GB'
 
 	input:
 	path read1
@@ -53,6 +52,7 @@ process RunSTARSolo {
 }
 
 process format_bam {
+	label 'process_tiny'
 	publishDir "${params.out_dir}/STARsolo"
 
 	output:

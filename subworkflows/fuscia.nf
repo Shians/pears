@@ -1,4 +1,5 @@
 process runFuscia {
+	label 'process_tiny'
 	publishDir "${params.out_dir}/fuscia_out", mode: 'copy'
 
 	input:

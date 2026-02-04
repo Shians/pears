@@ -1,4 +1,5 @@
 process GenMasterdata {
+	label 'process_low'
 	publishDir params.out_dir, mode: 'copy'
 
 	input:
