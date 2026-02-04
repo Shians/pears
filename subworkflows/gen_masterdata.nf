@@ -1,29 +1,24 @@
-//		conda "${projectDir}/env/pears_env.yml"
-
-
-process GEN_MASTERDATA {
+process GenMasterdata {
 	publishDir params.out_dir, mode: 'copy'
 
 	input:
-	params.known_list
-	params.reference
-	params.flexiplex_searchlen
-	params.out_dir
-	params.fuscia_up
-	params.fuscia_down
+	path known_list
+	path ref_gene
+	path ref_fasta
+	val flexi_searchlen
+	val fuscia_up
+	val fuscia_down
+	path gen_masterdata_py
 
 	output:
 	path "masterdata.csv"	
 
 	script:
 	"""
-
-	python $projectDir/subworkflows/gen_masterdata.py \
-	       				$params.known_list \
-	       				$params.ref_gene \
-					$params.ref_fasta \
-					$params.flexiplex_searchlen . $params.fuscia_up $params.fuscia_down
-	
+	python $gen_masterdata_py \
+		$known_list \
+		$ref_gene \
+		$ref_fasta \
+		$flexi_searchlen . $fuscia_up $fuscia_down
 	"""
-
 }
