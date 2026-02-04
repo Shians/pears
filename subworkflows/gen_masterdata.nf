@@ -15,7 +15,7 @@ process GenMasterdata {
 
 	script:
 	"""
-	python $projectDir/subworkflows/gen_masterdata.py \
+	python gen_masterdata.py \
 		$known_list \
 		$ref_gene \
 		$ref_fasta \
