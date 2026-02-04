@@ -1,8 +1,9 @@
-process formatFuscia{
+process formatFuscia {
+	label 'process_tiny'
 	publishDir "${params.out_dir}", mode: 'copy'
 
 	input:
-	val "fuscia complete"
+	path fuscia_files
 	val output_file
 
 	output:
@@ -14,20 +15,21 @@ process formatFuscia{
 
 	import pandas as pd
 	import os
+	import glob
 
 	def add_fusion_name(file):
 		r = pd.read_table(file)
 		if r.empty == False:
-			r['fusion'] =  os.path.basename(file).split("_")[0]
+			r['fusion'] = os.path.basename(file).split("_")[0]
 			r = r[r['cell_barcode'] != '-']
 			return r
 
-	in_dir = '$params.out_dir/fuscia_out/'
-	df = pd.DataFrame(columns=['cell_barcode', 'molecular_barcode','fusion'])
-	for file in os.listdir(in_dir):
-		r = add_fusion_name(f'{in_dir}{file}')
-		if r is not None:
-		   df = pd.concat([df, r], axis = 0, ignore_index = True)
+	df = pd.DataFrame(columns=['cell_barcode', 'molecular_barcode', 'fusion'])
+	for file in glob.glob('*'):
+		if os.path.isfile(file):
+			r = add_fusion_name(file)
+			if r is not None:
+				df = pd.concat([df, r], axis=0, ignore_index=True)
 	df['cell_barcode'] = df['cell_barcode'].str.replace('-1', "")
 
 	# Remove the last two columns
@@ -36,11 +38,11 @@ process formatFuscia{
 	df = df.drop_duplicates()
 
 	df.to_csv('${output_file}', index=False)
-
 	"""
 }
 
-process formatFlexiplex{
+process formatFlexiplex {
+	label 'process_tiny'
 	publishDir "${params.out_dir}", mode: 'copy'
 
 	input:
@@ -54,10 +56,10 @@ process formatFlexiplex{
 	script:
 	"""
 	#!/usr/bin/env python3
-	
+
 	import pandas as pd
 	import os
-	
+
 	def add_fusion_name(file):
 		r = pd.read_table(file)
 		if r.empty == False:
@@ -73,7 +75,7 @@ process formatFlexiplex{
 			df = pd.concat([df, r], axis = 0, ignore_index = True)
 	# Remove non-unique rows
 	df = df.drop_duplicates()
-	df.to_csv(f'$output_file', index=False)	
+	df.to_csv(f'$output_file', index=False)
 
 	"""
 
