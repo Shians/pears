@@ -1,22 +1,14 @@
-process RUN_STARsolo {
+process RunSTARSolo {
 	publishDir "${params.out_dir}/STARsolo", mode: 'copy'
-	time = '1d'
-	memory = '200'
-
-	input:
-	params.genome_index
-	params.read1
-	params.read2
-	params.out_dir
-	params.STAR
-	params.possible_barcode_list
+	time '24h'
+	memory '200GB'
 
 	output:
-	path "Aligned.sortedByCoord.out.bam" // Define outputs
-    	path "Aligned.sortedByCoord.out.bam.bai"
-    	path "Solo.out/Gene/filtered/barcodes.tsv"
-    	path "Solo.out/Gene/filtered/features.tsv"
-    	path "Solo.out/Gene/filtered/matrix.mtx"
+	path "Aligned.sortedByCoord.out.bam"
+	path "Aligned.sortedByCoord.out.bam.bai"
+	path "Solo.out/Gene/filtered/barcodes.tsv"
+	path "Solo.out/Gene/filtered/features.tsv"
+	path "Solo.out/Gene/filtered/matrix.mtx"
 
 	script:
 	"""
@@ -42,26 +34,22 @@ process RUN_STARsolo {
 	--chimSegmentReadGapMax 3 \
 	--chimMultimapNmax 50 \
 	--soloType CB_UMI_Simple \
-	--soloCBwhitelist $params.possible_barcode_list \
+	--soloCBwhitelist $params.barcode_whitelist \
 	--soloUMIlen $params.umi_len \
 	--soloUMIdedup NoDedup \
 	--outSAMattributes NH HI nM AS CB UB \
 	--soloBarcodeReadLength 0
 
 	$projectDir/modules/samtools-1.18/samtools index Aligned.sortedByCoord.out.bam
-
 	"""
 
 }
 
 process format_bam {
 	publishDir "${params.out_dir}/STARsolo"
-	
-	input:
-	RUN_STARsolo.out
 
 	output:
-	file('*.bam') into bam_files, val("aligner done") into aligner_done
+	file('*.bam')
 
 	script:
 	"""
@@ -69,5 +57,4 @@ process format_bam {
 
 	$projectDir/modules/samtools-1.18/samtools index file Aligned.sortedByCoord.out_chr.bam
 	"""
-
 }
