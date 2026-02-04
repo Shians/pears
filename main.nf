@@ -5,7 +5,6 @@ include { runFuscia } from './subworkflows/fuscia.nf'
 include { runFlexiplex } from './subworkflows/flexiplex.nf'
 include { runArriba } from './subworkflows/arriba.nf'
 include { formatFuscia } from './subworkflows/formatting.nf'
-//include { formatFlexiplex } from './subworkflows/formatting.nf'
 include { getBarcodesArriba } from './subworkflows/arriba.nf'
 include {formatFlexiplex as formatFlexiplex1} from './subworkflows/formatting.nf'
 include {formatFlexiplex as formatFlexiplex2} from './subworkflows/formatting.nf'
@@ -37,7 +36,13 @@ workflow {
 				)
 			}
 
-	STARsolo_result = RunSTARSolo()
+	STARsolo_result = RunSTARSolo(
+		Channel.fromPath(params.read1).collect(),
+		Channel.fromPath(params.read2).collect(),
+		file(params.genome_index),
+		file(params.barcode_whitelist),
+		params.umi_len
+	)
 
 	Fuscia_output_ch   = runFuscia(mapped_ch, STARsolo_result[0], STARsolo_result[1])
 	Flexiplex_output_ch = runFlexiplex(mapped_ch)
@@ -53,7 +58,4 @@ workflow {
 	formatFuscia(Fuscia_collected, "master_fuscia.csv")
 	formatFlexiplex1(Flexiplex_collected, "flexiplex_out", "master_flexiplex.csv")
 	formatFlexiplex2(ArribaBC_collected, "arriba_out", "master_arriba.csv")
-
 }
-
-

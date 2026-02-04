@@ -3,6 +3,13 @@ process RunSTARSolo {
 	time '24h'
 	memory '200GB'
 
+	input:
+	path read1
+	path read2
+	path genome_index
+	path barcode_whitelist
+	val umi_len
+
 	output:
 	path "Aligned.sortedByCoord.out.bam"
 	path "Aligned.sortedByCoord.out.bam.bai"
@@ -12,11 +19,11 @@ process RunSTARSolo {
 
 	script:
 	"""
-	$params.STAR \
+	STAR \
 	--runThreadN $task.cpus \
-	--genomeDir $params.genome_index \
+	--genomeDir $genome_index \
 	--genomeLoad NoSharedMemory \
-	--readFilesIn $params.read2 $params.read1 \
+	--readFilesIn $read2 $read1 \
 	--readFilesCommand zcat \
 	--outSAMtype BAM SortedByCoordinate \
 	--outSAMunmapped Within \
@@ -34,13 +41,13 @@ process RunSTARSolo {
 	--chimSegmentReadGapMax 3 \
 	--chimMultimapNmax 50 \
 	--soloType CB_UMI_Simple \
-	--soloCBwhitelist $params.barcode_whitelist \
-	--soloUMIlen $params.umi_len \
+	--soloCBwhitelist $barcode_whitelist \
+	--soloUMIlen $umi_len \
 	--soloUMIdedup NoDedup \
 	--outSAMattributes NH HI nM AS CB UB \
 	--soloBarcodeReadLength 0
 
-	$projectDir/modules/samtools-1.18/samtools index Aligned.sortedByCoord.out.bam
+	samtools index Aligned.sortedByCoord.out.bam
 	"""
 
 }
