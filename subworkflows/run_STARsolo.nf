@@ -19,32 +19,32 @@ process RunSTARSolo {
 	script:
 	"""
 	STAR \
-	--runThreadN $task.cpus \
-	--genomeDir $genome_index \
-	--genomeLoad NoSharedMemory \
-	--readFilesIn $read2 $read1 \
-	--readFilesCommand zcat \
-	--outSAMtype BAM SortedByCoordinate \
-	--outSAMunmapped Within \
-	--outBAMcompression 0 \
-	--outFilterMultimapNmax 50 \
-	--peOverlapNbasesMin 10 \
-	--alignSplicedMateMapLminOverLmate 0.5 \
-	--alignSJstitchMismatchNmax 5 -1 5 5 \
-	--chimSegmentMin 10 \
-	--chimOutType WithinBAM HardClip \
-	--chimJunctionOverhangMin 10 \
-	--chimScoreDropMax 30 \
-	--chimScoreJunctionNonGTAG 0 \
-	--chimScoreSeparation 1 \
-	--chimSegmentReadGapMax 3 \
-	--chimMultimapNmax 50 \
-	--soloType CB_UMI_Simple \
-	--soloCBwhitelist $barcode_whitelist \
-	--soloUMIlen $umi_len \
-	--soloUMIdedup NoDedup \
-	--outSAMattributes NH HI nM AS CB UB \
-	--soloBarcodeReadLength 0
+		--runThreadN $task.cpus \
+		--genomeDir $genome_index \
+		--genomeLoad NoSharedMemory \
+		--readFilesIn $read2 $read1 \
+		--readFilesCommand zcat \
+		--outSAMtype BAM SortedByCoordinate \
+		--outSAMunmapped Within \
+		--outBAMcompression 0 \
+		--outFilterMultimapNmax 50 \
+		--peOverlapNbasesMin 10 \
+		--alignSplicedMateMapLminOverLmate 0.5 \
+		--alignSJstitchMismatchNmax 5 -1 5 5 \
+		--chimSegmentMin 10 \
+		--chimOutType WithinBAM HardClip \
+		--chimJunctionOverhangMin 10 \
+		--chimScoreDropMax 30 \
+		--chimScoreJunctionNonGTAG 0 \
+		--chimScoreSeparation 1 \
+		--chimSegmentReadGapMax 3 \
+		--chimMultimapNmax 50 \
+		--soloType CB_UMI_Simple \
+		--soloCBwhitelist $barcode_whitelist \
+		--soloUMIlen $umi_len \
+		--soloUMIdedup NoDedup \
+		--outSAMattributes NH HI nM AS CB UB \
+		--soloBarcodeReadLength 0
 
 	samtools index Aligned.sortedByCoord.out.bam
 	"""
