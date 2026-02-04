@@ -10,13 +10,12 @@ include { formatFlexiplex as formatFlexiplex2 } from './subworkflows/formatting.
 
 workflow {
 	masterdata_ch = GenMasterdata(
-		file(params.known_list),
+		file(params.known_fusions_list),
 		file(params.ref_gene),
 		file(params.ref_fasta),
-		params.flexi_searchlen,
+		params.flexiplex_searchlen,
 		params.fuscia_up,
-		params.fuscia_down,
-		file("$projectDir/subworkflows/gen_masterdata.py")
+		params.fuscia_down
 	)
 
 	mapped_ch = masterdata_ch \
@@ -36,9 +35,9 @@ workflow {
 			}
 
 	STARsolo_result = RunSTARSolo(
-		channel.fromPath(params.read1).collect(),
-		channel.fromPath(params.read2).collect(),
-		file(params.genome_index),
+		channel.fromPath(params.fastq_r1).collect(),
+		channel.fromPath(params.fastq_r2).collect(),
+		file(params.star_genome_index),
 		file(params.barcode_whitelist),
 		params.umi_len
 	)

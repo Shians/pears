@@ -43,7 +43,7 @@ process getBarcodesArriba {
 		cut -f30 |\
 		sed 's/,/ \\n/g' |\
 		sed 's/^/^@/g' |\
-		grep -f - <(gunzip -c ${params.read1}) -A3 --no-group-separator |\
+		grep -f - <(gunzip -c ${params.fastq_r1}) -A3 --no-group-separator |\
 			sed "/^[@+]/! s/^/START/g" > "\$fusion_name".fastq ;
 
 		${projectDir}/modules/flexiplex/flexiplex -x START \

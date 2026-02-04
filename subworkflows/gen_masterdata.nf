@@ -9,14 +9,13 @@ process GenMasterdata {
 	val flexi_searchlen
 	val fuscia_up
 	val fuscia_down
-	path gen_masterdata_py
 
 	output:
-	path "masterdata.csv"	
+	path "masterdata.csv"
 
 	script:
 	"""
-	python $gen_masterdata_py \
+	python $projectDir/subworkflows/gen_masterdata.py \
 		$known_list \
 		$ref_gene \
 		$ref_fasta \

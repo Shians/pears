@@ -20,7 +20,7 @@ process runFlexiplex {
 	# Define the fusion name and flexiplex path
 
 	# Run flexiplex with the specified parameters
-	paste <(gunzip -c ${params.read1}) <(gunzip -c ${params.read2}) | \
+	paste <(gunzip -c ${params.fastq_r1}) <(gunzip -c ${params.fastq_r2}) | \
 	sed "/^[@+]/! s/^/START/g" | sed "/^[@+]/! s/	//g" | \
 	${projectDir}/modules/flexiplex/flexiplex -p $task.cpus -n ${fusion_name} \
 		-x ${sequence1}${sequence2} -d grep -f 1 > ${fusion_name}_reads.fastq
