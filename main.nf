@@ -5,8 +5,8 @@ include { runFlexiplex } from './subworkflows/flexiplex.nf'
 include { runArriba } from './subworkflows/arriba.nf'
 include { formatFuscia } from './subworkflows/formatting.nf'
 include { getBarcodesArriba } from './subworkflows/arriba.nf'
-include {formatFlexiplex as formatFlexiplex1} from './subworkflows/formatting.nf'
-include {formatFlexiplex as formatFlexiplex2} from './subworkflows/formatting.nf'
+include { formatFlexiplex as formatFlexiplex1 } from './subworkflows/formatting.nf'
+include { formatFlexiplex as formatFlexiplex2 } from './subworkflows/formatting.nf'
 
 workflow {
 	masterdata_ch = GenMasterdata(
@@ -49,9 +49,9 @@ workflow {
 	ArribaBC_output_ch  = getBarcodesArriba(mapped_ch, Arriba_output_ch)
 
 	// collapse each into a single emission
-	Fuscia_collected   = Fuscia_output_ch | collect
+	Fuscia_collected = Fuscia_output_ch | collect
 	Flexiplex_collected = Flexiplex_output_ch | collect
-	ArribaBC_collected  = ArribaBC_output_ch | collect
+	ArribaBC_collected = ArribaBC_output_ch | collect
 
 	// formatting
 	formatFuscia(Fuscia_collected, "master_fuscia.csv")
