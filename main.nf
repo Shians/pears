@@ -1,4 +1,3 @@
-// setting up scrips and software
 include { GenMasterdata } from './subworkflows/gen_masterdata.nf'
 include { RunSTARSolo } from './subworkflows/run_STARsolo.nf'
 include { runFuscia } from './subworkflows/fuscia.nf'
@@ -37,8 +36,8 @@ workflow {
 			}
 
 	STARsolo_result = RunSTARSolo(
-		Channel.fromPath(params.read1).collect(),
-		Channel.fromPath(params.read2).collect(),
+		channel.fromPath(params.read1).collect(),
+		channel.fromPath(params.read2).collect(),
 		file(params.genome_index),
 		file(params.barcode_whitelist),
 		params.umi_len
