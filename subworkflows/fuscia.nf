@@ -8,7 +8,7 @@ process runFuscia {
 	path bam_index
 
 	output:
-	path('*')
+	path('*.discovered_discordant_reads.tsv')
 
 	script:
 	// Use Groovy's conditional logic to handle the min and max comparison
