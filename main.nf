@@ -1,12 +1,12 @@
-include { GenMasterdata } from './subworkflows/gen_masterdata.nf'
-include { RunSTARSolo } from './subworkflows/run_STARsolo.nf'
-include { runFuscia } from './subworkflows/fuscia.nf'
-include { runFlexiplex } from './subworkflows/flexiplex.nf'
-include { runArriba } from './subworkflows/arriba.nf'
-include { formatFuscia } from './subworkflows/formatting.nf'
-include { getBarcodesArriba } from './subworkflows/arriba.nf'
-include { formatFlexiplex as formatFlexiplex1 } from './subworkflows/formatting.nf'
-include { formatFlexiplex as formatFlexiplex2 } from './subworkflows/formatting.nf'
+include { GenMasterdata } from './modules/gen_masterdata.nf'
+include { RunSTARSolo } from './modules/run_STARsolo.nf'
+include { runFuscia } from './modules/fuscia.nf'
+include { runFlexiplex } from './modules/flexiplex.nf'
+include { runArriba } from './modules/arriba.nf'
+include { formatFuscia } from './modules/formatting.nf'
+include { getBarcodesArriba } from './modules/arriba.nf'
+include { formatFlexiplex as formatFlexiplex1 } from './modules/formatting.nf'
+include { formatFlexiplex as formatFlexiplex2 } from './modules/formatting.nf'
 
 workflow {
 	masterdata_ch = GenMasterdata(
@@ -19,20 +19,20 @@ workflow {
 	)
 
 	mapped_ch = masterdata_ch \
-       	   | splitCsv(header:true) \
-           | map { row ->
-		   		tuple(
-					row.fusion_genes,
-					row.chrom1,
-					row.gene1,
-					row.base1,
-					row.sequence1,
-					row.chrom2,
-					row.gene2,
-					row.base2,
-					row.sequence2
-				)
-			}
+		| splitCsv(header:true) \
+		| map { row ->
+			tuple(
+				row.fusion_genes,
+				row.chrom1,
+				row.gene1,
+				row.base1,
+				row.sequence1,
+				row.chrom2,
+				row.gene2,
+				row.base2,
+				row.sequence2
+			)
+		}
 
 	STARsolo_result = RunSTARSolo(
 		channel.fromPath(params.fastq_r1).collect(),
