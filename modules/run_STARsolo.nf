@@ -37,11 +37,11 @@ process runSTARSolo {
 	val umi_len
 
 	output:
-	path "Aligned.sortedByCoord.out.bam"
-	path "Aligned.sortedByCoord.out.bam.bai"
-	path "Solo.out/Gene/filtered/barcodes.tsv"
-	path "Solo.out/Gene/filtered/features.tsv"
-	path "Solo.out/Gene/filtered/matrix.mtx"
+	path("Aligned.sortedByCoord.out.bam"), emit: bam
+	path("Aligned.sortedByCoord.out.bam.bai"), emit: bam_index
+	path("Solo.out/Gene/filtered/barcodes.tsv"), emit: barcodes
+	path("Solo.out/Gene/filtered/features.tsv"), emit: features
+	path("Solo.out/Gene/filtered/matrix.mtx"), emit: matrix
 
 	script:
 	"""

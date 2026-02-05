@@ -74,7 +74,7 @@ workflow {
 		params.umi_len
 	)
 
-	Fuscia_output_ch   = runFuscia(mapped_ch, STARsolo_result[0], STARsolo_result[1])
+	Fuscia_output_ch   = runFuscia(mapped_ch, STARsolo_result.out.bam, STARsolo_result.out.bam_index)
 	Flexiplex_output_ch = runFlexiplex(mapped_ch, include_list_ch)
 	Arriba_output_ch = runArriba(STARsolo_result[0])
 	ArribaBC_output_ch  = getBarcodesArriba(mapped_ch, Arriba_output_ch, include_list_ch)
