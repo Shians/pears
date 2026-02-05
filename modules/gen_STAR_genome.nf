@@ -4,7 +4,7 @@ process genGenome {
 
     script:
     """
-    arriba/download_references.sh $params.arriba_genome_version
+    sh arriba/download_references.sh $params.arriba_genome_version
 
     STAR --runThreadN $task.cpus \
         --runMode genomeGenerate \
