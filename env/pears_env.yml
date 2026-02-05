@@ -3,8 +3,8 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - python=3.14
-  - samtools=1.23
+  - python=3.12
+  - samtools=1.21
   - star=2.7.11b
   - arriba=2.5.1
   - flexiplex=1.02.5
