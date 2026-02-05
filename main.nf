@@ -1,3 +1,5 @@
+nextflow.enable.dsl=2
+
 include { validateParameters; paramsSummaryLog } from 'plugin/nf-schema'
 
 include { downloadReferences } from './modules/download_references.nf'
