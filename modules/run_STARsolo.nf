@@ -1,3 +1,30 @@
+process buildSTARIndex {
+	label 'process_high'
+	publishDir "${params.out_dir}/STAR_index", mode: 'copy'
+
+	input:
+	path ref_fasta
+	path ref_gtf
+	val read_length
+
+	output:
+	path "star_index", emit: index
+
+	script:
+	def sjdb_overhang = read_length.toInteger() - 1
+	"""
+	mkdir -p star_index
+
+	STAR \
+		--runMode genomeGenerate \
+		--runThreadN $task.cpus \
+		--genomeDir star_index \
+		--genomeFastaFiles $ref_fasta \
+		--sjdbGTFfile $ref_gtf \
+		--sjdbOverhang $sjdb_overhang
+	"""
+}
+
 process runSTARSolo {
 	label 'process_high'
 	publishDir "${params.out_dir}/STARsolo", mode: 'copy'

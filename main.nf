@@ -1,8 +1,10 @@
 include { validateParameters; paramsSummaryLog } from 'plugin/nf-schema'
 
+include { downloadReferences } from './modules/download_references.nf'
 include { genMasterdata } from './modules/gen_masterdata.nf'
 include { prepareIncludeList } from './modules/prepare_include_list.nf'
-include { runSTARSolo } from './modules/run_STARsolo.nf'
+include { calculateReadLength } from './modules/calculate_read_length.nf'
+include { buildSTARIndex; runSTARSolo } from './modules/run_STARsolo.nf'
 include { runFuscia } from './modules/fuscia.nf'
 include { runFlexiplex } from './modules/flexiplex.nf'
 include { runArriba } from './modules/arriba.nf'
@@ -15,13 +17,19 @@ workflow {
 	// Validate parameters against schema
 	validateParameters()
 	log.info paramsSummaryLog(workflow)
+
+	// Download reference genome and annotation
+	references = downloadReferences(params.genome_version)
+	ref_fasta = references.fasta
+	ref_gtf = references.gtf
+
 	// Prepare barcode include list (decompress if gzipped)
 	include_list_ch = prepareIncludeList(file(params.barcode_include_list))
 
 	masterdata_ch = genMasterdata(
 		file(params.known_fusions_list),
-		file(params.ref_gene),
-		file(params.ref_fasta),
+		ref_gtf,
+		ref_fasta,
 		params.flexiplex_searchlen,
 		params.fuscia_up,
 		params.fuscia_down
@@ -43,10 +51,25 @@ workflow {
 			)
 		}
 
+	// Calculate R2 read length for STAR index generation
+	r2_files_ch = channel.fromPath(params.fastq_r2).collect()
+	read_length_ch = calculateReadLength(r2_files_ch)
+
+	// Build STAR index if not provided, otherwise use existing
+	if (params.star_genome_index) {
+		star_index_ch = channel.value(file(params.star_genome_index))
+	} else {
+		star_index_ch = buildSTARIndex(
+			ref_fasta,
+			ref_gtf,
+			read_length_ch
+		)
+	}
+
 	STARsolo_result = runSTARSolo(
 		channel.fromPath(params.fastq_r1).collect(),
 		channel.fromPath(params.fastq_r2).collect(),
-		file(params.star_genome_index),
+		star_index_ch,
 		include_list_ch,
 		params.umi_len
 	)

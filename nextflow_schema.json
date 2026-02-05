@@ -37,36 +37,49 @@
         "reference_options": {
             "title": "Reference Options",
             "type": "object",
-            "description": "Reference genome and annotation files",
+            "description": "Reference genome configuration",
             "properties": {
-                "ref_fasta": {
+                "genome_version": {
                     "type": "string",
-                    "format": "file-path",
-                    "pattern": "^\\S+\\.fa(sta)?(\\.gz)?$",
-                    "description": "Path to reference genome FASTA file.",
-                    "fa_icon": "fas fa-book"
-                },
-                "ref_gene": {
-                    "type": "string",
-                    "format": "file-path",
-                    "pattern": "^\\S+\\.gtf(\\.gz)?$",
-                    "description": "Path to gene annotation GTF file.",
-                    "fa_icon": "fas fa-book"
+                    "default": "GRCh38+GENCODE44",
+                    "description": "Genome assembly and annotation version. References will be downloaded automatically.",
+                    "fa_icon": "fas fa-dna",
+                    "enum": [
+                        "GRCh38+GENCODE44",
+                        "GRCh38+GENCODE38",
+                        "GRCh38+ENSEMBL104",
+                        "GRCh38+RefSeq",
+                        "hg38+GENCODE44",
+                        "hg38+GENCODE38",
+                        "hg38+ENSEMBL104",
+                        "hg38+RefSeq",
+                        "GRCh37+GENCODE19",
+                        "GRCh37+ENSEMBL87",
+                        "GRCh37+RefSeq",
+                        "hg19+GENCODE19",
+                        "hg19+ENSEMBL87",
+                        "hg19+RefSeq",
+                        "hs37d5+GENCODE19",
+                        "hs37d5+ENSEMBL87",
+                        "hs37d5+RefSeq",
+                        "GRCm39+GENCODEM27",
+                        "GRCm39+RefSeq",
+                        "mm39+GENCODEM27",
+                        "mm39+RefSeq",
+                        "GRCm38+GENCODEM25",
+                        "GRCm38+RefSeq",
+                        "mm10+GENCODEM25",
+                        "mm10+RefSeq"
+                    ]
                 },
                 "star_genome_index": {
                     "type": "string",
                     "format": "directory-path",
-                    "description": "Path to STAR genome index directory.",
+                    "description": "Path to pre-built STAR genome index. If provided, skips reference download and index building.",
                     "fa_icon": "fas fa-folder"
-                },
-                "arriba_genome_version": {
-                    "type": "string",
-                    "default": "GRCh38+GENCODE44",
-                    "description": "Genome version string for Arriba.",
-                    "fa_icon": "fas fa-tag"
                 }
             },
-            "required": ["ref_fasta", "ref_gene", "star_genome_index"]
+            "required": ["genome_version"]
         },
         "output_options": {
             "title": "Output Options",
@@ -91,7 +104,8 @@
                     "type": "integer",
                     "default": 91,
                     "minimum": 1,
-                    "description": "Length of Read 2 in nucleotides.",
+                    "hidden": true,
+                    "description": "Deprecated: Read length is now calculated automatically from R2 FASTQ files.",
                     "fa_icon": "fas fa-ruler"
                 },
                 "umi_len": {
@@ -108,7 +122,7 @@
                     "fa_icon": "fas fa-list"
                 }
             },
-            "required": ["R2_length", "umi_len"]
+            "required": ["umi_len"]
         },
         "fuscia_options": {
             "title": "FUSCIA Options",
