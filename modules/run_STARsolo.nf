@@ -48,7 +48,6 @@ process runSTARSolo {
 
 	samtools index Aligned.sortedByCoord.out.bam
 	"""
-
 }
 
 process formatBAM {
