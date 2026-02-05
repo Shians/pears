@@ -1,3 +1,5 @@
+include { validateParameters; paramsSummaryLog } from 'plugin/nf-schema'
+
 include { genMasterdata } from './modules/gen_masterdata.nf'
 include { prepareIncludeList } from './modules/prepare_include_list.nf'
 include { runSTARSolo } from './modules/run_STARsolo.nf'
@@ -10,6 +12,9 @@ include { formatFlexiplex as formatFlexiplex1 } from './modules/formatting.nf'
 include { formatFlexiplex as formatFlexiplex2 } from './modules/formatting.nf'
 
 workflow {
+	// Validate parameters against schema
+	validateParameters()
+	log.info paramsSummaryLog(workflow)
 	// Prepare barcode include list (decompress if gzipped)
 	include_list_ch = prepareIncludeList(file(params.barcode_include_list))
 
