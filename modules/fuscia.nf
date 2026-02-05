@@ -23,6 +23,6 @@ process runFuscia {
 	fusion_name=$fusion_name
 
 	# Run the fuscia discovery command
-	python fuscia/discover_chimeric_transcripts.py $bam_file $gr1 $gr2 . $fusion_name $params.fuscia_mapqual
+	fuscia_discover_chimeric_transcripts.py $bam_file \$gr1 \$gr2 . \$fusion_name $params.fuscia_mapqual
 	"""
 }

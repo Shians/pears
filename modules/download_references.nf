@@ -15,6 +15,6 @@ process downloadReferences {
 
     script:
     """
-    sh arriba/download_references.sh $genome_version --no-index
+    arriba_download_references.sh $genome_version --no-index
     """
 }
