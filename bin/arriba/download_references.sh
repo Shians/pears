@@ -171,13 +171,6 @@ else
 	sed -e 's/^MT/chrM/' -e 's/^\([1-9XY]\|[12][0-9]\)/chr\1/'
 fi > "$ANNOTATION.gtf"
 
-# Create consistent output names for pipeline integration
-ln -sf "$ASSEMBLY$VIRAL.fa" genome.fa
-ln -sf "$ANNOTATION.gtf" genes.gtf
-if [ -f "$ASSEMBLY$VIRAL.fa.fai" ]; then
-	ln -sf "$ASSEMBLY$VIRAL.fa.fai" genome.fa.fai
-fi
-
 # Build STAR index unless --no-index is specified
 if [ "$BUILD_INDEX" = true ]; then
 	mkdir STAR_index_${ASSEMBLY}${VIRAL}_${ANNOTATION}
