@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Download reference genome and gene annotation.
+# Usage: download_references.sh ASSEMBLY+ANNOTATION [--no-index]
+# The --no-index flag skips STAR index generation.
+
 declare -A ASSEMBLIES
 ASSEMBLIES[hs37d5]="http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/phase2_reference_assembly_sequence/hs37d5.fa.gz"
 ASSEMBLIES[hg19]="http://hgdownload.cse.ucsc.edu/goldenpath/hg19/bigZips/chromFa.tar.gz"
@@ -16,6 +20,7 @@ ANNOTATIONS[GENCODE19]="http://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human
 ANNOTATIONS[RefSeq_hg19]="http://hgdownload.cse.ucsc.edu/goldenpath/hg19/database/refGene.txt.gz"
 ANNOTATIONS[ENSEMBL87]="http://ftp.ensembl.org/pub/grch37/release-87/gtf/homo_sapiens/Homo_sapiens.GRCh37.87.chr.gtf.gz"
 ANNOTATIONS[GENCODE38]="http://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_38/gencode.v38.annotation.gtf.gz"
+ANNOTATIONS[GENCODE44]="http://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_44/gencode.v44.annotation.gtf.gz"
 ANNOTATIONS[RefSeq_hg38]="http://hgdownload.cse.ucsc.edu/goldenpath/hg38/database/refGene.txt.gz"
 ANNOTATIONS[ENSEMBL104]="http://ftp.ensembl.org/pub/release-104/gtf/homo_sapiens/Homo_sapiens.GRCh38.104.chr.gtf.gz"
 ANNOTATIONS[GENCODEM25]="http://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M25/gencode.vM25.annotation.gtf.gz"
@@ -34,9 +39,11 @@ COMBINATIONS["GRCh37+GENCODE19"]="GRCh37+GENCODE19"
 COMBINATIONS["GRCh37+RefSeq"]="GRCh37+RefSeq_hg19"
 COMBINATIONS["GRCh37+ENSEMBL87"]="GRCh37+ENSEMBL87"
 COMBINATIONS["hg38+GENCODE38"]="hg38+GENCODE38"
+COMBINATIONS["hg38+GENCODE44"]="hg38+GENCODE44"
 COMBINATIONS["hg38+RefSeq"]="hg38+RefSeq_hg38"
 COMBINATIONS["hg38+ENSEMBL104"]="hg38+ENSEMBL104"
 COMBINATIONS["GRCh38+GENCODE38"]="GRCh38+GENCODE38"
+COMBINATIONS["GRCh38+GENCODE44"]="GRCh38+GENCODE44"
 COMBINATIONS["GRCh38+RefSeq"]="GRCh38+RefSeq_hg38"
 COMBINATIONS["GRCh38+ENSEMBL104"]="GRCh38+ENSEMBL104"
 COMBINATIONS["GRCm38+GENCODEM25"]="GRCm38+GENCODEM25"
@@ -51,8 +58,14 @@ for COMBINATION in ${!COMBINATIONS[@]}; do
 	COMBINATIONS["${COMBINATION%+*}viral+${COMBINATION#*+}"]="${COMBINATIONS[$COMBINATION]%+*}viral+${COMBINATIONS[$COMBINATION]#*+}"
 done
 
-if [ $# -ne 1 ] || [ -z "$1" ] || [ -z "${COMBINATIONS[$1]}" ]; then
-	echo "Usage: $(basename $0) ASSEMBLY+ANNOTATION" 1>&2
+# Parse arguments
+BUILD_INDEX=true
+if [ "$2" = "--no-index" ]; then
+	BUILD_INDEX=false
+fi
+
+if [ $# -lt 1 ] || [ -z "$1" ] || [ -z "${COMBINATIONS[$1]}" ]; then
+	echo "Usage: $(basename $0) ASSEMBLY+ANNOTATION [--no-index]" 1>&2
 	echo "Available assemblies and annotations:" 1>&2
 	tr ' ' '\n' <<<"${!COMBINATIONS[@]}" | sort 1>&2
 	exit 1
@@ -158,6 +171,17 @@ else
 	sed -e 's/^MT/chrM/' -e 's/^\([1-9XY]\|[12][0-9]\)/chr\1/'
 fi > "$ANNOTATION.gtf"
 
-mkdir STAR_index_${ASSEMBLY}${VIRAL}_${ANNOTATION}
-STAR --runMode genomeGenerate --genomeDir STAR_index_${ASSEMBLY}${VIRAL}_${ANNOTATION} --genomeFastaFiles "$ASSEMBLY$VIRAL.fa" --sjdbGTFfile "$ANNOTATION.gtf" --runThreadN "$THREADS" --sjdbOverhang "$SJDBOVERHANG"
+# Create consistent output names for pipeline integration
+ln -sf "$ASSEMBLY$VIRAL.fa" genome.fa
+ln -sf "$ANNOTATION.gtf" genes.gtf
+if [ -f "$ASSEMBLY$VIRAL.fa.fai" ]; then
+	ln -sf "$ASSEMBLY$VIRAL.fa.fai" genome.fa.fai
+fi
 
+# Build STAR index unless --no-index is specified
+if [ "$BUILD_INDEX" = true ]; then
+	mkdir STAR_index_${ASSEMBLY}${VIRAL}_${ANNOTATION}
+	STAR --runMode genomeGenerate --genomeDir STAR_index_${ASSEMBLY}${VIRAL}_${ANNOTATION} --genomeFastaFiles "$ASSEMBLY$VIRAL.fa" --sjdbGTFfile "$ANNOTATION.gtf" --runThreadN "$THREADS" --sjdbOverhang "$SJDBOVERHANG"
+fi
+
+echo "Done!"
