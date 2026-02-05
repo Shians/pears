@@ -2,7 +2,6 @@ name: pears
 channels:
   - conda-forge
   - bioconda
-  - defaults
 dependencies:
   - python=3.14
   - samtools=1.23
