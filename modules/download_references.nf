@@ -10,8 +10,8 @@ process downloadReferences {
     val genome_version
 
     output:
-    path ("*.fa", arity: 1), emit: fasta
-    path ("*.gtf", arity: 1), emit: gtf
+    path("*.fa"), emit: fasta
+    path("*.gtf"), emit: gtf
 
     script:
     """
