@@ -89,7 +89,7 @@
                 "out_dir": {
                     "type": "string",
                     "format": "directory-path",
-                    "default": "${projectDir}/out",
+                    "default": "pears_output",
                     "description": "Directory for pipeline output files.",
                     "fa_icon": "fas fa-folder-open"
                 }
@@ -100,17 +100,8 @@
             "type": "object",
             "description": "Parameters defining read structure",
             "properties": {
-                "R2_length": {
-                    "type": "integer",
-                    "default": 91,
-                    "minimum": 1,
-                    "hidden": true,
-                    "description": "Deprecated: Read length is now calculated automatically from R2 FASTQ files.",
-                    "fa_icon": "fas fa-ruler"
-                },
                 "umi_len": {
                     "type": "integer",
-                    "default": 12,
                     "minimum": 1,
                     "description": "Length of UMI (Unique Molecular Identifier) in nucleotides.",
                     "fa_icon": "fas fa-barcode"
@@ -118,6 +109,7 @@
                 "barcode_include_list": {
                     "type": "string",
                     "format": "file-path",
+                    "default": "${projectDir}/assets/737K-august-2016.txt.gz",
                     "description": "Path to cell barcode whitelist file (can be gzipped).",
                     "fa_icon": "fas fa-list"
                 }
@@ -175,10 +167,10 @@
     },
     "allOf": [
         { "$ref": "#/defs/input_options" },
+        { "$ref": "#/defs/read_structure_options" },
         { "$ref": "#/defs/reference_options" },
         { "$ref": "#/defs/output_options" },
-        { "$ref": "#/defs/read_structure_options" },
-        { "$ref": "#/defs/fuscia_options" },
-        { "$ref": "#/defs/flexiplex_options" }
+        { "$ref": "#/defs/flexiplex_options" },
+        { "$ref": "#/defs/fuscia_options" }
     ]
 }
