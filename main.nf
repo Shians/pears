@@ -6,7 +6,7 @@ include { downloadReferences } from './modules/download_references.nf'
 include { genMasterdata } from './modules/gen_masterdata.nf'
 include { prepareIncludeList } from './modules/prepare_include_list.nf'
 include { calculateReadLength } from './modules/calculate_read_length.nf'
-include { buildSTARIndex; runSTARSolo } from './modules/run_STARsolo.nf'
+include { buildSTARIndex; runSTARSolo } from './modules/star_solo.nf'
 include { runFuscia } from './modules/fuscia.nf'
 include { runFlexiplex } from './modules/flexiplex.nf'
 include { runArriba } from './modules/arriba.nf'
@@ -76,9 +76,9 @@ workflow {
 		params.umi_len
 	)
 
-	Fuscia_output_ch   = runFuscia(mapped_ch, STARsolo_result.out.bam, STARsolo_result.out.bam_index)
+	Fuscia_output_ch   = runFuscia(mapped_ch, STARsolo_result.bam, STARsolo_result.bam_index)
 	Flexiplex_output_ch = runFlexiplex(mapped_ch, include_list_ch)
-	Arriba_output_ch = runArriba(STARsolo_result[0])
+	Arriba_output_ch = runArriba(STARsolo_result.bam)
 	ArribaBC_output_ch  = getBarcodesArriba(mapped_ch, Arriba_output_ch, include_list_ch)
 
 	// collapse each into a single emission
