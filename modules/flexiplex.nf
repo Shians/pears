@@ -10,6 +10,7 @@ process runFlexiplex {
 
 	input:
 	tuple val(fusion_genes), val(chrom1), val(gene1), val(base1), val(sequence1), val(chrom2), val(gene2), val(base2), val(sequence2)
+	path include_list
 
 	output:
 	path "barcodes_${fusion_genes}_${chrom1}_${base1}_${chrom2}_${base2}_reads_barcodes.txt"
@@ -17,8 +18,6 @@ process runFlexiplex {
 	script:
 	fusion_name="${fusion_genes}_${chrom1}_${base1}_${chrom2}_${base2}"
 	"""
-	# Define the fusion name and flexiplex path
-
 	# Run flexiplex with the specified parameters
 	paste <(gunzip -c ${params.fastq_r1}) <(gunzip -c ${params.fastq_r2}) | \
 	sed "/^[@+]/! s/^/START/g" | sed "/^[@+]/! s/	//g" | \
@@ -27,7 +26,7 @@ process runFlexiplex {
 
 	flexiplex -x START \
 		${params.flexiplex_demultiplex_options} \
-		-k ${params.barcode_whitelist} -n barcodes_${fusion_name} ${fusion_name}_reads.fastq
+		-k ${include_list} -n barcodes_${fusion_name} ${fusion_name}_reads.fastq
     """
 }
 

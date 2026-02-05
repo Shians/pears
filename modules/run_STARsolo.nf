@@ -1,4 +1,4 @@
-process RunSTARSolo {
+process runSTARSolo {
 	label 'process_high'
 	publishDir "${params.out_dir}/STARsolo", mode: 'copy'
 
@@ -6,7 +6,7 @@ process RunSTARSolo {
 	path read1
 	path read2
 	path genome_index
-	path barcode_whitelist
+	path include_list
 	val umi_len
 
 	output:
@@ -40,7 +40,7 @@ process RunSTARSolo {
 		--chimSegmentReadGapMax 3 \
 		--chimMultimapNmax 50 \
 		--soloType CB_UMI_Simple \
-		--soloCBwhitelist $barcode_whitelist \
+		--soloCBwhitelist $include_list \
 		--soloUMIlen $umi_len \
 		--soloUMIdedup NoDedup \
 		--outSAMattributes NH HI nM AS CB UB \

@@ -1,5 +1,6 @@
-include { GenMasterdata } from './modules/gen_masterdata.nf'
-include { RunSTARSolo } from './modules/run_STARsolo.nf'
+include { genMasterdata } from './modules/gen_masterdata.nf'
+include { prepareIncludeList } from './modules/prepare_include_list.nf'
+include { runSTARSolo } from './modules/run_STARsolo.nf'
 include { runFuscia } from './modules/fuscia.nf'
 include { runFlexiplex } from './modules/flexiplex.nf'
 include { runArriba } from './modules/arriba.nf'
@@ -9,7 +10,10 @@ include { formatFlexiplex as formatFlexiplex1 } from './modules/formatting.nf'
 include { formatFlexiplex as formatFlexiplex2 } from './modules/formatting.nf'
 
 workflow {
-	masterdata_ch = GenMasterdata(
+	// Prepare barcode include list (decompress if gzipped)
+	include_list_ch = prepareIncludeList(file(params.barcode_include_list))
+
+	masterdata_ch = genMasterdata(
 		file(params.known_fusions_list),
 		file(params.ref_gene),
 		file(params.ref_fasta),
@@ -34,18 +38,18 @@ workflow {
 			)
 		}
 
-	STARsolo_result = RunSTARSolo(
+	STARsolo_result = runSTARSolo(
 		channel.fromPath(params.fastq_r1).collect(),
 		channel.fromPath(params.fastq_r2).collect(),
 		file(params.star_genome_index),
-		file(params.barcode_whitelist),
+		include_list_ch,
 		params.umi_len
 	)
 
 	Fuscia_output_ch   = runFuscia(mapped_ch, STARsolo_result[0], STARsolo_result[1])
-	Flexiplex_output_ch = runFlexiplex(mapped_ch)
+	Flexiplex_output_ch = runFlexiplex(mapped_ch, include_list_ch)
 	Arriba_output_ch = runArriba(STARsolo_result[0])
-	ArribaBC_output_ch  = getBarcodesArriba(mapped_ch, Arriba_output_ch)
+	ArribaBC_output_ch  = getBarcodesArriba(mapped_ch, Arriba_output_ch, include_list_ch)
 
 	// collapse each into a single emission
 	Fuscia_collected = Fuscia_output_ch | collect
