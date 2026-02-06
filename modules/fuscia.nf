@@ -6,6 +6,7 @@ process runFuscia {
 	tuple val(fusion_genes), val(chrom1), val(gene1), val(base1), val(sequence1), val(chrom2), val(gene2), val(base2), val(sequence2)
 	path bam_file
 	path bam_index
+	val mapqual
 
 	output:
 	path('*.discovered_discordant_reads.tsv')
@@ -23,6 +24,6 @@ process runFuscia {
 	fusion_name=$fusion_name
 
 	# Run the fuscia discovery command
-	fuscia_discover_chimeric_transcripts.py $bam_file \$gr1 \$gr2 . \$fusion_name $params.fuscia_mapqual
+	fuscia_discover_chimeric_transcripts.py $bam_file \$gr1 \$gr2 . \$fusion_name $mapqual
 	"""
 }
