@@ -1,4 +1,4 @@
-process genMasterdata {
+process genFusionTargets {
 	label 'process_low'
 	publishDir params.out_dir, mode: 'copy'
 
@@ -11,7 +11,7 @@ process genMasterdata {
 	val fuscia_down
 
 	output:
-	path "masterdata.csv"
+	path "fusion_targets.csv"
 
 	script:
 	"""

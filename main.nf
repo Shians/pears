@@ -3,7 +3,7 @@ nextflow.enable.dsl=2
 include { validateParameters; paramsSummaryLog } from 'plugin/nf-schema'
 
 include { downloadReferences } from './modules/download_references.nf'
-include { genMasterdata } from './modules/gen_masterdata.nf'
+include { genFusionTargets } from './modules/gen_fusion_targets.nf'
 include { prepareIncludeList } from './modules/prepare_include_list.nf'
 include { calculateReadLength } from './modules/calculate_read_length.nf'
 include { buildSTARIndex; runSTARSolo } from './modules/star_solo.nf'
@@ -25,19 +25,19 @@ workflow {
 		log.info "Using pre-built references: skipping download and index building"
 		ref_fasta = channel.value(file(params.ref_fasta))
 		ref_gtf = channel.value(file(params.ref_gtf))
-		star_index_ch = channel.value(file(params.star_genome_index))
+		star_index = channel.value(file(params.star_genome_index))
 	} else {
 		// Download reference genome and annotation
 		references = downloadReferences(params.genome_version)
 		ref_fasta = references.fasta
 		ref_gtf = references.gtf
-		star_index_ch = null  // Will be built below
+		star_index = null  // Will be built below
 	}
 
 	// Prepare barcode include list (decompress if gzipped)
-	include_list_ch = prepareIncludeList(file(params.barcode_include_list))
+ 	include_list  = prepareIncludeList(file(params.barcode_include_list))
 
-	masterdata_ch = genMasterdata(
+	fusion_targets = genFusionTargets(
 		file(params.known_fusions_list),
 		ref_gtf,
 		ref_fasta,
@@ -46,7 +46,7 @@ workflow {
 		params.fuscia_down
 	)
 
-	mapped_ch = masterdata_ch \
+	fusion_target_rows = fusion_targets \
 		| splitCsv(header:true) \
 		| map { row ->
 			tuple(
@@ -65,33 +65,33 @@ workflow {
 	// Build STAR index if not already provided via pre-built references
 	if (!params.star_genome_index) {
 		// Calculate R2 read length for STAR index generation
-		r2_files_ch = channel.fromPath(params.fastq_r2).collect()
-		read_length_ch = calculateReadLength(r2_files_ch)
+		r2_files = channel.fromPath(params.fastq_r2).collect()
+		read_length = calculateReadLength(r2_files)
 
-		star_index_ch = buildSTARIndex(
+		star_index = buildSTARIndex(
 			ref_fasta,
 			ref_gtf,
-			read_length_ch
+			read_length
 		)
 	}
 
 	STARsolo_result = runSTARSolo(
 		channel.fromPath(params.fastq_r1).collect(),
 		channel.fromPath(params.fastq_r2).collect(),
-		star_index_ch,
-		include_list_ch,
+		star_index,
+		include_list,
 		params.umi_len
 	)
 
-	Fuscia_output_ch   = runFuscia(mapped_ch, STARsolo_result.bam, STARsolo_result.bam_index, params.fuscia_mapqual)
-	Flexiplex_output_ch = runFlexiplex(mapped_ch, include_list_ch)
-	Arriba_output_ch = runArriba(STARsolo_result.bam, ref_fasta, ref_gtf)
-	ArribaBC_output_ch  = getBarcodesArriba(mapped_ch, Arriba_output_ch, include_list_ch)
+	Fuscia_output   = runFuscia(fusion_target_rows, STARsolo_result.bam, STARsolo_result.bam_index, params.fuscia_mapqual)
+	Flexiplex_output = runFlexiplex(fusion_target_rows, include_list )
+	Arriba_output = runArriba(STARsolo_result.bam, ref_fasta, ref_gtf)
+	ArribaBC_output  = getBarcodesArriba(fusion_target_rows, Arriba_output, include_list)
 
 	// collapse each into a single emission
-	Fuscia_collected = Fuscia_output_ch | collect
-	Flexiplex_collected = Flexiplex_output_ch | collect
-	ArribaBC_collected = ArribaBC_output_ch | collect
+	Fuscia_collected = Fuscia_output | collect
+	Flexiplex_collected = Flexiplex_output | collect
+	ArribaBC_collected = ArribaBC_output | collect
 
 	// formatting
 	formatFuscia(Fuscia_collected, "master_fuscia.csv")
