@@ -10,10 +10,8 @@ include { buildSTARIndex; runSTARSolo } from './modules/star_solo.nf'
 include { runFuscia } from './modules/fuscia.nf'
 include { runFlexiplex } from './modules/flexiplex.nf'
 include { runArriba } from './modules/arriba.nf'
-include { formatFuscia } from './modules/formatting.nf'
+include { formatFuscia; formatFlexiplex; formatArriba } from './modules/formatting.nf'
 include { getBarcodesArriba } from './modules/arriba.nf'
-include { formatFlexiplex as formatFlexiplex1 } from './modules/formatting.nf'
-include { formatFlexiplex as formatFlexiplex2 } from './modules/formatting.nf'
 
 workflow {
 	// Validate parameters against schema
@@ -107,6 +105,6 @@ workflow {
 
 	// formatting
 	formatFuscia(Fuscia_collected, "master_fuscia.csv")
-	formatFlexiplex1(Flexiplex_collected, "flexiplex_out", "master_flexiplex.csv", params.out_dir)
-	formatFlexiplex2(ArribaBC_collected, "arriba_out", "master_arriba.csv", params.out_dir)
+	formatFlexiplex(Flexiplex_collected, "master_flexiplex.csv")
+	formatArriba(ArribaBC_collected, "master_arriba.csv")
 }
