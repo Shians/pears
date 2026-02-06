@@ -4,6 +4,8 @@ process runArriba {
 
 	input:
 	path bam_file
+	path ref_fasta
+	path ref_gene
 
 	output:
 	path "fusions.tsv"
@@ -14,8 +16,8 @@ process runArriba {
 		-x $bam_file \
 		-o fusions.tsv \
 		-O fusions.discarded.tsv \
-		-a $params.ref_fasta \
-		-g $params.ref_gene \
+		-a $ref_fasta \
+		-g $ref_gene \
 		-f blacklist
 	"""
 }

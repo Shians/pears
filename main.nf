@@ -85,7 +85,7 @@ workflow {
 
 	Fuscia_output_ch   = runFuscia(mapped_ch, STARsolo_result.bam, STARsolo_result.bam_index)
 	Flexiplex_output_ch = runFlexiplex(mapped_ch, include_list_ch)
-	Arriba_output_ch = runArriba(STARsolo_result.bam)
+	Arriba_output_ch = runArriba(STARsolo_result.bam, ref_fasta, ref_gtf)
 	ArribaBC_output_ch  = getBarcodesArriba(mapped_ch, Arriba_output_ch, include_list_ch)
 
 	// collapse each into a single emission
