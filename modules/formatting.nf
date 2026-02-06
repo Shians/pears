@@ -49,6 +49,7 @@ process formatFlexiplex {
 	path('*')
 	val dir
 	val output_file
+	val out_dir
 
 	output:
 	path "${output_file}"
@@ -67,7 +68,7 @@ process formatFlexiplex {
 			df_temp['fusion'] =  os.path.basename(file).split("_")[1]
 			return df_temp
 
-	in_dir = f'$params.out_dir/$dir/'
+	in_dir = f'$out_dir/$dir/'
 	df = pd.DataFrame(columns = ['cell_barcode', 'molecular_barcode', 'fusion'])
 	for file in os.listdir(in_dir):
 		if os.path.basename(file)[0:8] == 'barcodes':
@@ -76,9 +77,7 @@ process formatFlexiplex {
 	# Remove non-unique rows
 	df = df.drop_duplicates()
 	df.to_csv(f'$output_file', index=False)
-
 	"""
-
 }
 
 

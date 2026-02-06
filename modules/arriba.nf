@@ -30,6 +30,8 @@ process getBarcodesArriba {
 	tuple val(fusion_genes), val(chrom1), val(gene1), val(base1), val(sequence1), val(chrom2), val(gene2), val(base2), val(sequence2)
 	path(fusion_table)
 	path(include_list)
+	path fastq_r1
+	val flexiplex_demultiplex_options
 
 	output:
 	path("barcodes_${fusion_genes}_${chrom1}_${base1}_${chrom2}_${base2}_reads_barcodes.txt")
@@ -46,11 +48,11 @@ process getBarcodesArriba {
 		cut -f30 |\
 		sed 's/,/ \\n/g' |\
 		sed 's/^/^@/g' |\
-		grep -f - <(gunzip -c ${params.fastq_r1}) -A3 --no-group-separator |\
+		grep -f - <(gunzip -c ${fastq_r1}) -A3 --no-group-separator |\
 			sed "/^[@+]/! s/^/START/g" > "\$fusion_name".fastq ;
 
 	flexiplex -x START \
-		${params.flexiplex_demultiplex_options} \
+		${flexiplex_demultiplex_options} \
 		-k ${include_list} -n barcodes_"\$fusion_name" \
 		"\$fusion_name".fastq
 	"""
