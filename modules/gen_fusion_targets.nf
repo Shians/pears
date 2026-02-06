@@ -15,7 +15,7 @@ process genFusionTargets {
 
 	script:
 	"""
-	python gen_masterdata.py \
+	gen_fusion_targets.py \
 		$known_list \
 		$ref_gene \
 		$ref_fasta \

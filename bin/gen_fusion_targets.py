@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Created on Mon Mar 20 20:11:22 2023
 
@@ -8,7 +9,7 @@ Created on Mon Mar 20 20:11:22 2023
 #input: gene_file(*/reference/gene/genes.gtf (refdata)), fusion_list (e.g. jjaffa output file)
 #if region is bigger/smaller than breakpoint site = region
 #output: {gene: [start, end]}
-#issue: if name does not match (ENSG code might match) it is ignored. 
+#issue: if name does not match (ENSG code might match) it is ignored.
 import pandas as pd
 import pybedtools
 import os
@@ -18,7 +19,7 @@ import sys
 def get_gene_dict(shr_output):
     r = pd.read_csv(shr_output)
     f = r["fusion genes"].str.split('--', expand = True).to_numpy().flatten()
-    
+
     gene_dict = {}
 
     for i in f:
@@ -30,7 +31,7 @@ def get_gene_dict(shr_output):
 
 def get_gene_range(gene_gtf, gene_dict):
     df = pd.read_csv(gene_gtf, delimiter="\t", usecols=[0, 2, 3, 4, 8] , skiprows=(5), header=None, names=['chrom', 'feature', 'start', 'end', 'attributes'])
-    
+
 
     df['attributes'] = df['attributes'].str.rsplit('gene_name "').str.get(1)
     df['attributes'] = df['attributes'].str.rsplit('";').str.get(0)
@@ -85,7 +86,7 @@ def gene_range(shr_output, gene_dict, up, down):
     df['gene1'] = gene1
     df['gene2'] = gene2
     #df.set_index('fusion genes', inplace =True)
-    
+
     return df
 
 def get_sequence(gene, fasta):
@@ -114,7 +115,7 @@ def get_flexi_sequences(df, len_barcode, fasta):
             gene1seq = None
             gene2seq = None
         gene1_seq.append(str(gene1seq).upper())
-        gene2_seq.append(str(gene2seq).upper())	
+        gene2_seq.append(str(gene2seq).upper())
 
 
     df['sequence1'] = gene1_seq
