@@ -20,10 +20,19 @@ workflow {
 	validateParameters()
 	log.info paramsSummaryLog(workflow)
 
-	// Download reference genome and annotation
-	references = downloadReferences(params.genome_version)
-	ref_fasta = references.fasta
-	ref_gtf = references.gtf
+	// Use pre-built references if all three are provided, otherwise download
+	if (params.ref_fasta && params.ref_gtf && params.star_genome_index) {
+		log.info "Using pre-built references: skipping download and index building"
+		ref_fasta = channel.value(file(params.ref_fasta))
+		ref_gtf = channel.value(file(params.ref_gtf))
+		star_index_ch = channel.value(file(params.star_genome_index))
+	} else {
+		// Download reference genome and annotation
+		references = downloadReferences(params.genome_version)
+		ref_fasta = references.fasta
+		ref_gtf = references.gtf
+		star_index_ch = null  // Will be built below
+	}
 
 	// Prepare barcode include list (decompress if gzipped)
 	include_list_ch = prepareIncludeList(file(params.barcode_include_list))
@@ -53,14 +62,12 @@ workflow {
 			)
 		}
 
-	// Calculate R2 read length for STAR index generation
-	r2_files_ch = channel.fromPath(params.fastq_r2).collect()
-	read_length_ch = calculateReadLength(r2_files_ch)
+	// Build STAR index if not already provided via pre-built references
+	if (!params.star_genome_index) {
+		// Calculate R2 read length for STAR index generation
+		r2_files_ch = channel.fromPath(params.fastq_r2).collect()
+		read_length_ch = calculateReadLength(r2_files_ch)
 
-	// Build STAR index if not provided, otherwise use existing
-	if (params.star_genome_index) {
-		star_index_ch = channel.value(file(params.star_genome_index))
-	} else {
 		star_index_ch = buildSTARIndex(
 			ref_fasta,
 			ref_gtf,

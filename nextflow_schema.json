@@ -42,7 +42,7 @@
                 "genome_version": {
                     "type": "string",
                     "default": "GRCh38+GENCODE44",
-                    "description": "Genome assembly and annotation version. References will be downloaded automatically.",
+                    "description": "Genome assembly and annotation version. References will be downloaded automatically if ref_fasta, ref_gtf, and star_genome_index are not provided.",
                     "fa_icon": "fas fa-dna",
                     "enum": [
                         "GRCh38+GENCODE40",
@@ -60,11 +60,27 @@
                 "star_genome_index": {
                     "type": "string",
                     "format": "directory-path",
-                    "description": "Path to pre-built STAR genome index. If provided, skips reference download and index building.",
+                    "description": "Path to pre-built STAR genome index. If provided, ref_fasta and ref_gtf must also be provided.",
                     "fa_icon": "fas fa-folder"
+                },
+                "ref_fasta": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Path to reference genome FASTA file. If provided, ref_gtf and star_genome_index must also be provided.",
+                    "fa_icon": "fas fa-file"
+                },
+                "ref_gtf": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Path to reference GTF annotation file. If provided, ref_fasta and star_genome_index must also be provided.",
+                    "fa_icon": "fas fa-file-alt"
                 }
             },
-            "required": ["genome_version"]
+            "dependentRequired": {
+                "star_genome_index": ["ref_fasta", "ref_gtf"],
+                "ref_fasta": ["ref_gtf", "star_genome_index"],
+                "ref_gtf": ["ref_fasta", "star_genome_index"]
+            }
         },
         "output_options": {
             "title": "Output Options",
