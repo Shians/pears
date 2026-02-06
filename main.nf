@@ -73,7 +73,7 @@ workflow {
 		)
 	}
 
-	STARsolo_result = runSTARSolo(
+	star_solo_result = runSTARSolo(
 		channel.fromPath(params.fastq_r1).collect(),
 		channel.fromPath(params.fastq_r2).collect(),
 		star_index,
@@ -81,30 +81,30 @@ workflow {
 		params.umi_len
 	)
 
-	Fuscia_output   = runFuscia(fusion_target_rows, STARsolo_result.bam, STARsolo_result.bam_index, params.fuscia_mapqual)
-	Flexiplex_output = runFlexiplex(
+	fuscia_result = runFuscia(fusion_target_rows, star_solo_result.bam, star_solo_result.bam_index, params.fuscia_mapqual)
+	flexiplex_result = runFlexiplex(
 		fusion_target_rows,
 		include_list,
 		channel.fromPath(params.fastq_r1).collect(),
 		channel.fromPath(params.fastq_r2).collect(),
 		params.flexiplex_demultiplex_options
 	)
-	Arriba_output = runArriba(STARsolo_result.bam, ref_fasta, ref_gtf)
-	ArribaBC_output  = getBarcodesArriba(
+	arriba_output = runArriba(star_solo_result.bam, ref_fasta, ref_gtf)
+	arriba_bc_output  = getBarcodesArriba(
 		fusion_target_rows,
-		Arriba_output,
+		arriba_output,
 		include_list,
 		channel.fromPath(params.fastq_r1).collect(),
 		params.flexiplex_demultiplex_options
 	)
 
 	// collapse each into a single emission
-	Fuscia_collected = Fuscia_output | collect
-	Flexiplex_collected = Flexiplex_output | collect
-	ArribaBC_collected = ArribaBC_output | collect
+	fuscia_collected = fuscia_result | collect
+	flexiplex_collected = flexiplex_result | collect
+	arriba_bc_collected = arriba_bc_output | collect
 
 	// formatting
-	formatFuscia(Fuscia_collected, "master_fuscia.csv")
-	formatFlexiplex(Flexiplex_collected, "master_flexiplex.csv")
-	formatArriba(ArribaBC_collected, "master_arriba.csv")
+	formatFuscia(fuscia_collected, "master_fuscia.csv")
+	formatFlexiplex(flexiplex_collected, "master_flexiplex.csv")
+	formatArriba(arriba_bc_collected, "master_arriba.csv")
 }
